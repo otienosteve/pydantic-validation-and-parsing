@@ -273,6 +273,33 @@ Another example would be to receive an email and convert it to all lowercase.
         return value.title()
 ```     
 Whatever is returned from the validation function will be the value for the field, we can therefore take advantage of this and parse the value as we deem fit.   
+The steps involved in using the field_validator() are ascertaining validity of the data and if it passes all checks then we parse it if necessary for it to conform to the required standard.   
+```
+from pydantic import BaseModel,FieldValidationInfo,ValidationError,field_validator,
+import re
+
+class Example(BaseModel):
+    first_name : str 
+    email : str
+
+    @field_validator('first_name')
+    @classmethod
+    def validate_name(cls, value):
+        if re.findall(r'\d',value):
+            raise ValidationError('first name must not contain a number')
+        if re.findall(r'\W',value):
+            raise ValidationError('first name must not contain special character')
+        return value.title()
+        
+
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls,value, info:FieldValidationInfo):
+      mailregex = re.compile(r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
+      if re.fullmatch(mailregex,value):
+         return value.lower()
+      raise ValidationError("Error in the email field")
+```     
 
 
 
@@ -290,4 +317,5 @@ Whatever is returned from the validation function will be the value for the fiel
 [codurance- Password Validation Rules](https://www.codurance.com/katas/password-validation)    
 [Pydantic types](https://docs.pydantic.dev/latest/api/types/#pydantic.types)  
 [Field Pydantic](https://docs.pydantic.dev/latest/usage/fields/)    
-[Field API Documentation](https://docs.pydantic.dev/latest/api/fields/)      
+[Field API Documentation](https://docs.pydantic.dev/latest/api/fields/)    
+[Stackabuse Email Regex For Validation](https://stackabuse.com/python-validate-email-address-with-regular-expressions-regex/)      
