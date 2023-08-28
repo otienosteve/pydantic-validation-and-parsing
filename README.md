@@ -197,14 +197,15 @@ class Example(BaseModel):
     date: condate(ge=date.today(),le=date.today()+timedelta(days=5))
 ```  
 
-#### Adding validation using the Field function  
+#### 2. Adding validation using the Field function  
 The Field function is used to add metadata to the fields defined in the model.  
 The metadata may include keyword arguments for constraining fields (gt,le,min_length,decimal_places) etc that is similar to the constraining fields we had seen earlier. 
     
 keyword arguments  
 
 default -  value if the field is not set    
-default_factory - callable used to generate values        
+default_factory - callable used to generate values  
+validate_default - specifies wether the default field should be validated.     
 alias - an alternative name for the attribute   
 exclude - determines wether to exclude the field from the model      
 strict - if True the Validation will be applied strictly    
@@ -227,6 +228,52 @@ age: Field(strict=True,gt=14,le=70, )  # int type
 name: Field(min_length=5,max_length=20)  # str type
 amount: Field(max_digits=5,decimal_places=2) # decimal type
 ```
+#### 3. Adding Validation using the field_validator function. field_validator()    
+This validation technique gives us more freedom to perform not only validation but also parsing. To use it we create a function that is used to validate a particular field and decorate it with the field validator function. While at it it's important to note that the field validator is a class method and therefore the first argument it receives should be the class.      
+Below is an example of it's usage.      
+```
+from pydantic import BaseModel, field_validator 
+
+class Example(BaseModel):
+    name : str 
+    age : int
+    email : str
+
+    @field_validator('name')
+    @classmethod
+    def validate_name(cls, value):
+        pass
+```  
+The `field_validator()` function accepts a field to validate as an argument. It can also accepts multiple or all fields as an arguments:      
+`@field_validator('name')`  - select single field     
+`@field_validator('name','age')`  - select multiple fields    
+`@field_validator('*')` - select all fields    
+
+The decorated function that is used for validation accepts the arguments in the following order.    
+1. The class - cls
+2. The field value - value  
+3. The FieldValidationInfo - Will contain data about the current validation context such as fields already validated (FieldValidationInfo.data) and the current field (FieldValidationInfo.field_name)  
+
+```
+    @field_validator('email')
+    @classmethod
+    def validate_email(cls, value, info:FieldValidationInfo):
+        # cls - the class
+        # value - the field value
+        # info  field validation info 
+``` 
+The validation function should do one of two things: either throw an Error or return the parsed value.  
+parsing is the process of cleaning data so that it conforms to a particular standard. An example would be; for a first_name field we would probably receive a correct value `allan` ,`aLLan`, `allaN` or `ALLAN` but it's format doesn't match the required standard, we probably want to title case it to `Allan`.     
+Another example would be to receive an email and convert it to all lowercase.    
+```
+    @field_validator('first_name')
+    @classmethod
+    def validate_name(cls, value, info:FieldValidationInfo):
+    # an example of parsing
+        return value.title()
+```     
+Whatever is returned from the validation function will be the value for the field, we can therefore take advantage of this and parse the value as we deem fit.   
+
 
 
 
