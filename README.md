@@ -59,7 +59,7 @@ Our aim is to add the following validation rules to the different fields.
 - Age   
         - must be an integer.   
         - must not be less than 14.     
-        - must not be greater than 18 characters.   
+        - must not be greater than 70.   
 
     
 Before we add validation to the fields above we will start by making deliberate mistakes to see how pydantic behaves by default by not setting some fields and providing wrong types to some fields.    
@@ -82,18 +82,124 @@ class User(BaseModel):
     email: str = None
     password: str = None
     age: int = None
-
 ```
-Another way would be to make the fields optional.  
+Another more explicit way would be to make use of the Optional attribute from the typing module.  
 ` from typing import Optional `     
 ```
 class User(BaseModel):
-    first_name: Optional[str] 
-    last_name: Optional[str] 
-    email: Optional[str] 
-    password: Optional[str] 
-    age: Optional[int] 
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None 
+    email: Optional[str] = None
+    password: Optional[str] = None
+    age: Optional[int] = None
 ```     
+The next intentional mistake we want to make is add invalid data types to some of our fields.    
+Adding a string to the age field that requires an int.    
+```
+u1 = User(first_name="Ada", last_name="Lovelace",email="adalve@gmail.com",password="adalve123", age='34')
+print(u1)
+```     
+On running our code we get do not get an error as the value we provide is automatically coerced into an integer. This is never always the case as it will depend on wether the value can be coerced into the required type.     
+The code below would throw an error.      
+```
+u1 = User(first_name="Ada", last_name="Lovelace",email="adalve@gmail.com", password="adalve123", age='f34')
+print(u1)
+```     
+![Error for incompatible type](./Error%20for%20invalid%20input-Pydantic.png)    
+The same exception would be thrown if an str field receives an int. You can further  explore with different incompatible types to be more informed on how coercion works by default in pydantic.    
+
+#### 1. Adding validation using constraining functions.   
+These functions are used to constrain data that can be added to particular fields. Each type in python has a a corresponding constrain function.    
+The functions receive predefined keyword arguments used to add enforce certain constrains to the fields.        
+
+- conint() - int
+    - gt (greater than)
+    - ge (greater than or equal to)
+    - lt (less than)
+    - le (less than or equal to)
+    - multiple_of (multiple of)
+    - strict (whether to allow coercion from compatible types)      
+
+example:    
+    age: conint(ge=14,le=70)          
+- confloat() - float  
+    - gt (greater than)
+    - ge (greater than or equal to)
+    - lt (less than)
+    - le (less than or equal to)
+    - multiple_of (multiple of)
+    - strict (whether to allow coercion from compatible types)      
+
+example:    
+    margin: confloat(gt=0.1,lt=0.9,strict=True) 
+
+
+- constr() - str    
+    - strip_whitespace (strip whitespace from the string),
+    - to_upper (convert the string to uppercase),
+    - to_lower (convert the string to lowercase),
+    - strict (whether to allow coercion from compatible types),
+    - min_length (minimum length of the string.),
+    - max_length (maximum length of the string.),
+    - pattern (regex pattern that the string must match)       
+
+example:    
+    name: constr(min_length=5,max_length=20) 
+     
+- codecimal() - decimal 
+    - gt (greater than)
+    - ge (greater than or equal to)
+    - lt (less than)
+    - le (less than or equal to)
+    - multiple_of (multiple of)
+    - strict (whether to allow coercion from compatible types) 
+    - max_digits (maximum number of digits)  
+    - decimal_places (number of decimal places)
+    - allow_inf_nan (allow infinity and NaN)
+
+example:    
+    amount: condecimal(max_digits=5,decimal_places=2) 
+     
+- conlist() - list  
+    - item_type	 (type of the items in the list (required))
+    - min_items (minimum length of the list)
+    - max_items (maximum length of the list)
+    - unique_items (whether the items in the list must be unique)
+
+example:    
+    shopping_list: conlist(str,min_items=2,max_items=10) 
+     
+- condate() - date   
+    - gt (the value must greater than)
+    - ge (the value must greater than or equal to)
+    - lt (the value must less than)
+    - le (the value must less than or equal to)
+    - strict (whether to validate the date value in strict mode)   
+
+example:    
+    date: condate(ge=date.today(),le=date.today()+timedelta(days=5))
+      
+Apart from these there are other types that can be constrained, example conbytes()-bytes, conset()-set, confrozenset() - frozenset.  more details on [The official documentation API](https://docs.pydantic.dev/latest/api/types/#pydantic.types)
+
+#### The code below demonstrates how we can achieve validation with the use of the constrained fields.   
+
+```
+from pydantic import conint, constr,conlist,condecimal
+
+from datetime import date, timedelta
+
+class Example(BaseModel):
+    age: conint(ge=14,le=70) 
+    margin: confloat(gt=0.1,lt=0.9,strict=True)
+    name: constr(min_length=5,max_length=20)
+    amount: condecimal(max_digits=5,decimal_places=2)
+    shopping_list: conlist(str,min_items=2,max_items=10)
+    date: condate(ge=date.today(),le=date.today()+timedelta(days=5))
+```  
+
+#### Adding validation using the Field function  
+The Field function is used to add metadata to the field defined in the models. The metadata may include keyword arguments for constraining fields 
+
 
 
 
@@ -106,4 +212,7 @@ class User(BaseModel):
 [Pydantic Version 1.10](https://docs.pydantic.dev/1.10/)       
 [Pydantic Version 2.2](https://docs.pydantic.dev/latest/)   
 [Validity -What-are-the-rules-for-email-address-syntax](https://knowledge.validity.com/hc/en-us/articles/220560587-What-are-the-rules-for-email-address-syntax-)    
-[codurance- Password Validation Rules](https://www.codurance.com/katas/password-validation)         
+[codurance- Password Validation Rules](https://www.codurance.com/katas/password-validation)    
+[Pydantic types](https://docs.pydantic.dev/latest/api/types/#pydantic.types)  
+[Field Pydantic](https://docs.pydantic.dev/latest/usage/fields/)    
+[Field API Documentation](https://docs.pydantic.dev/latest/api/fields/)      
