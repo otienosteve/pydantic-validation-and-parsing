@@ -198,7 +198,35 @@ class Example(BaseModel):
 ```  
 
 #### Adding validation using the Field function  
-The Field function is used to add metadata to the field defined in the models. The metadata may include keyword arguments for constraining fields 
+The Field function is used to add metadata to the fields defined in the model.  
+The metadata may include keyword arguments for constraining fields (gt,le,min_length,decimal_places) etc that is similar to the constraining fields we had seen earlier. 
+    
+keyword arguments  
+
+default -  value if the field is not set    
+default_factory - callable used to generate values        
+alias - an alternative name for the attribute   
+exclude - determines wether to exclude the field from the model      
+strict - if True the Validation will be applied strictly    
+gt - greater than   
+ge - greater than or equal to       
+lt - less than  
+le - less than or equal to      
+multiple_of - values must be a multiple of  
+min_length - must not be less than that length  
+max_length - must not be more than length   
+max_digits - maximum number of digits allowed       
+decimal_places - maximum number of decimal places allowed   
+extra -  include extra fields used by json      
+
+Note: The `Field()` function  is versatile but should be used with caution. The validation you add to the field should be compatible with the type it's being added for. i/e for a int type you can use gt but not max_length, for the decimal type you can use decimal_places but not min_length. 
+example usage:      
+      
+```
+age: Field(strict=True,gt=14,le=70, )  # int type
+name: Field(min_length=5,max_length=20)  # str type
+amount: Field(max_digits=5,decimal_places=2) # decimal type
+```
 
 
 
