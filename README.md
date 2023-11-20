@@ -1,8 +1,18 @@
 # Pydantic validation and parsing   
 
 ### Into to validation  
-Never Trust the user!- This is a golden rule in programming. It is pessimistic but a crucial factor to consider when developing software for end users, after all even a black hat hacker can be a user who is hell-bent on exploiting the least vulnerability they can find in your system. With this in mind it is important to be cautious and explicit with the input you expect from the user.  
+Never Trust the user!- This is a golden rule in programming, though pessimistic its  a crucial factor to consider when developing software.   
 
+🚧🚧🚧 Deviation alert!     
+
+We human beings boast of how much we love peace, but how comes when watching an action movie we usually tend to be eager to get to the part where the drama starts, where two people are either holding guns at each other or where theres suspense and the its about to go down. 
+As Ernest Gaines appositely put it, “Why is it that, as a culture, we are more comfortable seeing two men holding guns than holding hands?”     
+
+The above short narrative tels you a lot about Human beings intrinsic nature, a pinch of salt kindness and a bag of rice malice. Does it have to do with the original sin? I am not a theologian but Maybe. Anyway the point that am trying to drive home is that you never have full awareness of the intentions of whoever you are dealing with at any time, this is not a campaign to proselytize you into the philosophy of always staying dangerous, but a reminder that you should always be mean with trust.     
+
+With the above in mind, it should go without saying that our users should not be trusted, they may not be ill-intended but probably out of curiosity they may desire to stretch our application past it's limit. We need to be creative enough to devise a way to tether them within certain confines. I therefore do not need to emphasize the need to be cautious cautious and explicit with the input you expect from the user.  
+
+### Validation 
 Validation is the process of passing data through certain checks to ensure it conforms to a particular required standard.     
 There are a number of data validation types which can be broadly categorized into 6 distinct groups.   
 1. Data Type Validation     
@@ -236,8 +246,7 @@ In the next section we will have a code along where we will walk through validat
 [Never trust a user- Laravel News](https://laravel-news.com/never-trust-your-users)     
 [Pydantic Validators](https://docs.pydantic.dev/latest/usage/validators/)     
 [Pydantic Version 1.10](https://docs.pydantic.dev/1.10/)       
-[Pydantic Version 2.2](https://docs.pydantic.dev/latest/)   
-[Validity -What-are-the-rules-for-email-address-syntax](https://knowledge.validity.com/hc/en-us/articles/220560587-What-are-the-rules-for-email-address-syntax-)    
+[Pydantic Version 2.2](https://docs.pydantic.dev/latest/)      
 [codurance- Password Validation Rules](https://www.codurance.com/katas/password-validation)    
 [Pydantic types](https://docs.pydantic.dev/latest/api/types/#pydantic.types)  
 [Field Pydantic](https://docs.pydantic.dev/latest/usage/fields/)    
